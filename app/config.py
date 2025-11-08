@@ -204,3 +204,19 @@ LOG_FILE = LOGS_DIR / "ids.log"
 # Memory Management
 MAX_MEMORY_GB = int(os.getenv("MAX_MEMORY_GB", 8))  # Max RAM usage
 BATCH_SIZE = int(os.getenv("BATCH_SIZE", 10000))  # For batch processing
+
+
+
+# ==================== DATABASE CONFIGURATION ====================
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_PATH = BASE_DIR / "ids_database.db"
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
+
+# Pagination defaults
+DEFAULT_PAGE_SIZE = 50
+MAX_PAGE_SIZE = 200
+
+# Alert settings
+ALERT_RETENTION_DAYS = None
