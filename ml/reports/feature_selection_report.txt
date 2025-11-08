@@ -1,0 +1,121 @@
+============================================================
+FEATURE SELECTION REPORT
+Generated: 2025-11-08T00:54:24.871558
+============================================================
+
+Total features analyzed: 36
+Features selected: 25
+
+TOP 25 FEATURES BY AGGREGATED SCORE:
+----------------------------------------
+29.  Avg Fwd Segment Size                    0.7520
+11.  Fwd Packet Length Mean                  0.7256
+ 9.  Fwd Packet Length Max                   0.4826
+32.  Subflow Fwd Bytes                       0.4492
+ 7. Total Length of Fwd Packets              0.4030
+14.  Packet Length Mean                      0.3990
+13.  Average Packet Size                     0.3488
+12.  Bwd Packet Length Mean                  0.3259
+30.  Avg Bwd Segment Size                    0.3231
+17.  Fwd IAT Mean                            0.2656
+ 5.  Total Fwd Packets                       0.2298
+31. Subflow Fwd Packets                      0.2151
+35. Init_Win_bytes_forward                   0.2087
+24.  PSH Flag Count                          0.2057
+27.  Fwd Header Length                       0.1839
+34.  Subflow Bwd Bytes                       0.1831
+18.  Fwd IAT Std                             0.1830
+ 1.  Destination Port                        0.1744
+ 8.  Total Length of Bwd Packets             0.1686
+ 2.  Flow Duration                           0.1479
+ 3. Flow Bytes/s                             0.1449
+28.  Bwd Header Length                       0.1440
+16.  Flow IAT Std                            0.1401
+36.  Init_Win_bytes_backward                 0.1341
+ 6.  Total Backward Packets                  0.1078
+
+============================================================
+FEATURE IMPORTANCE BY METHOD:
+============================================================
+
+
+RANDOM_FOREST:
+----------------------------------------
+ 1.  Fwd Packet Length Max                   0.1212
+ 2.  Subflow Fwd Bytes                       0.1204
+ 3.  Fwd Packet Length Mean                  0.1151
+ 4. Total Length of Fwd Packets              0.1020
+ 5.  Avg Fwd Segment Size                    0.0856
+ 6.  Packet Length Mean                      0.0531
+ 7.  Total Fwd Packets                       0.0405
+ 8.  Average Packet Size                     0.0366
+ 9.  Fwd IAT Std                             0.0331
+10. Subflow Fwd Packets                      0.0260
+
+XGBOOST:
+----------------------------------------
+ 1.  Avg Fwd Segment Size                    0.3685
+ 2.  Fwd Packet Length Mean                  0.2770
+ 3.  Fwd IAT Mean                            0.1040
+ 4. Subflow Fwd Packets                      0.0562
+ 5.  Fwd Packet Length Max                   0.0414
+ 6.  Total Fwd Packets                       0.0367
+ 7.  Packet Length Mean                      0.0218
+ 8.  Fwd IAT Std                             0.0177
+ 9.  URG Flag Count                          0.0175
+10.  Flow IAT Std                            0.0173
+
+UNIVARIATE:
+----------------------------------------
+ 1.  Bwd Packet Length Mean                  273766.6678
+ 2.  Avg Bwd Segment Size                    273766.6678
+ 3.  PSH Flag Count                          209311.1071
+ 4.  Average Packet Size                     193263.1386
+ 5.  Packet Length Mean                      193068.6978
+ 6.  ACK Flag Count                          67591.1235
+ 7. Init_Win_bytes_forward                   43997.8287
+ 8.  URG Flag Count                          31591.0647
+ 9.  Fwd IAT Std                             25859.9787
+10.  Flow IAT Std                            25728.5775
+
+MUTUAL_INFO:
+----------------------------------------
+ 1.  Average Packet Size                     0.9567
+ 2. Total Length of Fwd Packets              0.9239
+ 3.  Subflow Fwd Bytes                       0.9236
+ 4.  Packet Length Mean                      0.8809
+ 5.  Destination Port                        0.8772
+ 6.  Avg Fwd Segment Size                    0.8322
+ 7.  Fwd Packet Length Mean                  0.8316
+ 8.  Fwd Packet Length Max                   0.8279
+ 9.  Total Length of Bwd Packets             0.8181
+10.  Subflow Bwd Bytes                       0.8177
+
+============================================================
+SELECTED FEATURES FOR MODEL:
+----------------------------------------
+ 1.  Avg Fwd Segment Size
+ 2.  Fwd Packet Length Mean
+ 3.  Fwd Packet Length Max
+ 4.  Subflow Fwd Bytes
+ 5. Total Length of Fwd Packets
+ 6.  Packet Length Mean
+ 7.  Average Packet Size
+ 8.  Bwd Packet Length Mean
+ 9.  Avg Bwd Segment Size
+10.  Fwd IAT Mean
+11.  Total Fwd Packets
+12. Subflow Fwd Packets
+13. Init_Win_bytes_forward
+14.  PSH Flag Count
+15.  Fwd Header Length
+16.  Subflow Bwd Bytes
+17.  Fwd IAT Std
+18.  Destination Port
+19.  Total Length of Bwd Packets
+20.  Flow Duration
+21. Flow Bytes/s
+22.  Bwd Header Length
+23.  Flow IAT Std
+24.  Init_Win_bytes_backward
+25.  ACK Flag Count
