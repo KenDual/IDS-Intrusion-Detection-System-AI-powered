@@ -328,153 +328,413 @@
 
 ---
 
-## **PHASE 6: Backend API (FastAPI)**
+## **PHASE 6: Backend API (FastAPI)** ✅ HOÀN THÀNH
 
-### 6.1 FastAPI Application Setup
-- [ ] Tạo `app/main.py` - Main FastAPI app
-- [ ] Configure CORS middleware
-- [ ] Add exception handlers (global error handling)
-- [ ] Startup event: 
-  - [ ] Load ML model
-  - [ ] Initialize database
-  - [ ] Create DetectionService instance
-- [ ] Shutdown event:
-  - [ ] Stop capture service
-  - [ ] Stop detection service
-  - [ ] Close database connections
+### 6.0 Core Application Setup ✅
+- [x] Tạo `app/main.py` - FastAPI application entry point
+- [x] Tạo `app/dependencies.py` - Shared dependencies (get_db, services)
+- [x] Configure CORS middleware (allow all origins)
+- [x] Add global exception handlers (404, 400, 500)
+- [x] Startup event:
+  - [x] Initialize database với `init_database()`
+  - [x] Load DetectionService singleton
+  - [x] Initialize ModelLoader (99.95% accuracy model)
+  - [x] Get CaptureService instance
+- [x] Shutdown event:
+  - [x] Stop DetectionService gracefully
+  - [x] Stop CaptureService gracefully
+  - [x] Cleanup resources
+- [x] Root endpoint (`/`) - API info
+- [x] Health check endpoint (`/health`) - System status
+- [x] Auto-generate Swagger docs (`/docs`)
+- [x] Auto-generate ReDoc (`/redoc`)
 
-### 6.2 Monitoring Endpoints
-- [ ] **POST /api/monitor/start**
-  - [ ] Start CaptureService
-  - [ ] Start DetectionService
-  - [ ] Return status + message
-- [ ] **POST /api/monitor/stop**
-  - [ ] Stop DetectionService
-  - [ ] Stop CaptureService
-  - [ ] Return final statistics
-- [ ] **GET /api/monitor/status**
-  - [ ] Capture status (is_running, packets_captured, active_flows)
-  - [ ] Detection status (predictions, alerts_created)
-  - [ ] Return combined statistics
+### 6.1 Monitor Control Endpoints ✅
+- [x] **File**: `app/routes/monitor.py`
+- [x] **POST /api/monitor/start**
+  - [x] Validate not already running (HTTP 400)
+  - [x] Start CaptureService với network interface
+  - [x] Initialize DetectionService với db + capture dependencies
+  - [x] Start DetectionService detection loop
+  - [x] Return status + interface info
+  - [x] Error handling (500 on failure)
+- [x] **POST /api/monitor/stop**
+  - [x] Validate is running (HTTP 400)
+  - [x] Stop DetectionService first
+  - [x] Stop CaptureService
+  - [x] Return final statistics (packets, flows, alerts)
+- [x] **GET /api/monitor/status**
+  - [x] CaptureService status (packets, flows, features)
+  - [x] DetectionService status (predictions, alerts)
+  - [x] Combined statistics JSON
+- [x] Register router: `app.include_router(monitor.router, prefix="/api/monitor", tags=["Monitor"])`
+- [x] Test: curl + PowerShell (AS ADMIN required)
 
-### 6.3 Alert Endpoints
-- [ ] **GET /api/alerts**
-  - [ ] Query parameters: page, limit, attack_type, severity, source_ip, date_from, date_to
-  - [ ] Use get_alerts() CRUD với pagination
-  - [ ] Return JSON: {alerts: [...], total: N, page: X}
-- [ ] **GET /api/alerts/{alert_id}**
-  - [ ] Get alert detail by ID
-  - [ ] Return 404 nếu không tìm thấy
-- [ ] **DELETE /api/alerts/{alert_id}**
-  - [ ] Delete alert (admin only)
-  - [ ] Return success message
-- [ ] **GET /api/alerts/recent**
-  - [ ] Get N recent alerts (default: 10)
-  - [ ] Use get_recent_alerts() CRUD
+### 6.2 Alert Endpoints ✅
+- [x] **File**: `app/routes/alerts.py`
+- [x] **GET /api/alerts**
+  - [x] Pagination: page, limit (max 200)
+  - [x] Filters: attack_type, severity, source_ip, date_from, date_to
+  - [x] Call `get_alerts()` CRUD
+  - [x] Call `count_alerts()` for total
+  - [x] Return: {alerts, total, page, limit, pages, has_next, has_prev}
+  - [x] Date validation (ISO format)
+- [x] **GET /api/alerts/recent**
+  - [x] Query param: n (default 10, max 100)
+  - [x] Call `get_recent_alerts()` CRUD
+  - [x] Return: {alerts, count}
+- [x] **GET /api/alerts/{alert_id}**
+  - [x] Get by ID
+  - [x] Return 404 if not found
+  - [x] Return alert.to_dict()
+- [x] **DELETE /api/alerts/{alert_id}**
+  - [x] Check exists (404 if not)
+  - [x] Call `delete_alert()` CRUD
+  - [x] Return success message
+- [x] Register router: `app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])`
+- [x] Test: 50+ alerts filtered successfully
 
-### 6.4 Statistics Endpoints
-- [ ] **GET /api/stats**
-  - [ ] Total alerts count
-  - [ ] Alerts by attack type
-  - [ ] Alerts by severity
-  - [ ] Top attacked IPs (top 10 dest_ip)
-  - [ ] Alerts timeline (last 24h, group by hour)
-  - [ ] System status (monitoring active/inactive)
-- [ ] **GET /api/stats/timeline**
-  - [ ] Query params: period (hour/day/week)
-  - [ ] Use get_alert_statistics() CRUD
-  - [ ] Return time-series data cho charts
+### 6.3 Statistics Endpoints ✅
+- [x] **File**: `app/routes/stats.py`
+- [x] **GET /api/stats**
+  - [x] Overview: total_alerts, critical, low, monitoring_active
+  - [x] Attack types count: DoS Hulk, PortScan, DDoS
+  - [x] Severity breakdown: critical vs low
+  - [x] Top 10 attacked IPs (custom query with GROUP BY)
+  - [x] Last 24h statistics via `get_alert_statistics()`
+  - [x] Return comprehensive dashboard data
+- [x] **GET /api/stats/timeline**
+  - [x] Query param: period (hour/day/week)
+  - [x] Period validation (HTTP 400)
+  - [x] Time-series data grouped by intervals:
+    - [x] hour: 5-minute intervals
+    - [x] day: 1-hour intervals
+    - [x] week: 1-day intervals
+  - [x] Return: {period, start_time, end_time, summary, timeline[]}
+  - [x] Each timeline entry: time, total, attack_types, severity
+- [x] Register router: `app.include_router(stats.router, prefix="/api/stats", tags=["Statistics"])`
+- [x] Test: All periods (hour/day/week) working
 
-### 6.5 Whitelist/Blacklist Endpoints
-- [ ] **GET /api/whitelist**
-  - [ ] List all whitelist entries
-  - [ ] Use get_all_whitelist() CRUD
-- [ ] **POST /api/whitelist**
-  - [ ] Body: {ip_address, description}
-  - [ ] Add IP to whitelist
-  - [ ] Return created entry
-- [ ] **DELETE /api/whitelist/{id}**
-  - [ ] Remove IP from whitelist
-- [ ] **GET /api/blacklist** (tương tự whitelist)
-- [ ] **POST /api/blacklist**
-- [ ] **DELETE /api/blacklist/{id}**
+### 6.4 IP Lists Endpoints ✅
+- [x] **File**: `app/routes/ip_lists.py`
+- [x] **Request Model**: IPAddressRequest (Pydantic)
+  - [x] IP validation với regex + octet check
+  - [x] Custom validator `@field_validator`
+  - [x] Return 422 on invalid IP
+- [x] **GET /api/whitelist**
+  - [x] Call `get_all_whitelist()` CRUD
+  - [x] Return: {whitelist, count}
+- [x] **POST /api/whitelist**
+  - [x] Validate IP format (Pydantic)
+  - [x] Call `add_to_whitelist()` CRUD
+  - [x] Reload whitelist in DetectionService
+  - [x] Return 201 + created entry
+  - [x] Return 400 if duplicate
+- [x] **DELETE /api/whitelist/{id}**
+  - [x] Get entry by ID (404 if not found)
+  - [x] Call `remove_from_whitelist()` by IP
+  - [x] Reload whitelist in DetectionService
+  - [x] Return success message
+- [x] **GET /api/blacklist** (tương tự whitelist)
+- [x] **POST /api/blacklist** (tương tự whitelist, không reload DetectionService)
+- [x] **DELETE /api/blacklist/{id}** (tương tự whitelist)
+- [x] Register router: `app.include_router(ip_lists.router, prefix="/api", tags=["IP Lists"])`
+- [x] Test: Add/delete whitelist/blacklist, IP validation (422 errors)
 
-### 6.6 Model Information Endpoints
-- [ ] **GET /api/model/info**
-  - [ ] Model version, accuracy, training date
-  - [ ] Load từ model_metadata.json
-  - [ ] Classes supported
-  - [ ] Features count
-- [ ] **GET /api/model/metrics**
-  - [ ] Detailed metrics (precision, recall, f1-score per class)
-  - [ ] Confusion matrix data
-  - [ ] Training history (nếu có)
+### 6.5 Model Info Endpoints ✅
+- [x] **File**: `app/routes/model.py`
+- [x] **GET /api/model/info**
+  - [x] Get from `ModelLoader.get_model_info()`
+  - [x] Return: model (version, algorithm, features, classes), performance (accuracy, f1), training (date, dataset), configuration
+  - [x] Check model loaded (500 if not)
+- [x] **GET /api/model/metrics**
+  - [x] Load `ml/reports/training_metrics.json`
+  - [x] Return detailed metrics (accuracy, precision, recall, f1 per class)
+  - [x] Return 404 if file not found
+  - [x] Handle JSON parse errors (500)
+- [x] **GET /api/model/status**
+  - [x] Model loaded status
+  - [x] Detection active status
+  - [x] Runtime statistics (predictions, alerts, filters)
+  - [x] Attacks detected by type
+  - [x] Cache performance stats
+- [x] Register router: `app.include_router(model.router, prefix="/api/model", tags=["Model"])`
+- [x] Test: All 3 endpoints working, metrics file exists
 
-### 6.7 WebSocket Endpoint
-- [ ] **WS /ws/alerts**
-  - [ ] Accept WebSocket connection
-  - [ ] Register connection với ConnectionManager
-  - [ ] Listen for alerts từ broadcast queue
-  - [ ] Send alerts to client as JSON
-  - [ ] Handle client disconnect
-  - [ ] Ping/pong for keep-alive
+### 6.6 WebSocket Endpoint ✅
+- [x] **Endpoint**: `@app.websocket("/ws/alerts")`
+- [x] Accept WebSocket connection
+- [x] Register với ConnectionManager (sync method, NOT await)
+- [x] Keep-alive loop với `receive_text()`
+- [x] Handle ping/pong messages
+- [x] Handle WebSocketDisconnect exception
+- [x] Disconnect cleanup (sync method, NOT await)
+- [x] Proper error handling & logging
+- [x] Real-time alert broadcasting via ConnectionManager.broadcast_worker()
+- [x] Test script: `scripts/test_websocket.py` (Python client)
+- [x] Test HTML: `scripts/test_websocket_simple.html` (Browser client)
+- [x] Test: WebSocket connects successfully, listens for alerts
 
-### 6.8 API Documentation
-- [ ] Auto-generate Swagger docs (FastAPI default)
-- [ ] Add description, tags, examples cho endpoints
-- [ ] Response models với Pydantic
-- [ ] Error response schemas
-
-### 6.9 Response Models (Pydantic)
-- [ ] AlertResponse
-- [ ] AlertListResponse (với pagination)
-- [ ] StatisticsResponse
-- [ ] MonitorStatusResponse
-- [ ] WhitelistEntryResponse
-- [ ] ModelInfoResponse
-
-### 6.10 Middleware & Security (Optional cho MVP)
-- [ ] Rate limiting (slowapi)
-- [ ] API key authentication (nếu cần)
-- [ ] Request logging
-- [ ] Response compression
+### 6.7 Integration & Testing ✅
+- [x] All 7 route modules registered in `app/main.py`
+- [x] All endpoints tested with curl/PowerShell
+- [x] Swagger UI accessible at `/docs`
+- [x] ReDoc accessible at `/redoc`
+- [x] CORS working (all origins allowed)
+- [x] Exception handlers working (404, 400, 500)
+- [x] Database session dependency working
+- [x] Service dependencies working (DetectionService, CaptureService)
+- [x] WebSocket real-time broadcasting ready
 
 ---
 
 ## **PHASE 7: Frontend (Jinja2 Templates)**
 
-### 7.1 Layout & Templates
-- [ ] **base.html**: Layout chung (navbar, footer)
-- [ ] **dashboard.html**: Trang chủ - overview stats
-- [ ] **alerts.html**: Danh sách alerts + filter
-- [ ] **alert_detail.html**: Chi tiết 1 alert
-- [ ] **monitor.html**: Real-time monitoring page
-- [ ] **settings.html**: Whitelist/Blacklist management
-- [ ] **model.html**: Model info & retrain
+### 7.0 Context & Prerequisites
+**Dependencies from Phase 6:**
+- FastAPI server running on `http://localhost:8000`
+- 7 REST API groups: Monitor, Alerts, Stats, IP Lists, Model
+- WebSocket endpoint: `ws://localhost:8000/ws/alerts`
+- Swagger docs: `http://localhost:8000/docs`
+- All endpoints return JSON (no Pydantic schemas required)
 
-### 7.2 Static Assets
-- [ ] CSS: Bootstrap hoặc Tailwind
-- [ ] JavaScript: 
-  - [ ] WebSocket client (connect /ws/alerts)
-  - [ ] Chart.js (visualize attack types, timeline)
-  - [ ] Real-time notifications
-  - [ ] Auto-refresh tables
+**Frontend Goals:**
+- Server-side rendered pages với Jinja2
+- Real-time WebSocket integration
+- Interactive charts với Chart.js
+- Responsive UI với Bootstrap/Tailwind
+- AJAX for API calls (không reload page)
 
-### 7.3 Dashboard Components
-- [ ] Total alerts counter
-- [ ] Attack types pie chart
-- [ ] Timeline chart (attacks over time)
-- [ ] Top attacked IPs table
-- [ ] Recent alerts feed
-- [ ] System status indicator
+### 7.1 Static Files Setup
+- [ ] Tạo `app/static/css/` directory
+  - [ ] `app/static/css/style.css` - Custom styles
+  - [ ] Hoặc link CDN: Bootstrap 5 / Tailwind CSS
+- [ ] Tạo `app/static/js/` directory
+  - [ ] `app/static/js/websocket.js` - WebSocket client
+  - [ ] `app/static/js/charts.js` - Chart.js integration
+  - [ ] `app/static/js/api.js` - API helper functions
+  - [ ] `app/static/js/notifications.js` - Toast/alerts
+- [ ] Configure static files trong `app/main.py`:
+  ```python
+  from fastapi.staticfiles import StaticFiles
+  app.mount("/static", StaticFiles(directory="app/static"), name="static")
+  ```
 
-### 7.4 Real-time Features
-- [ ] WebSocket connection status
-- [ ] Live alert notifications (toast/modal)
-- [ ] Auto-update alert count
-- [ ] Sound/desktop notification (optional)
+### 7.2 Base Layout & Templates
+- [ ] **app/templates/base.html** - Master layout
+  - [ ] HTML5 doctype + meta tags
+  - [ ] Link CSS (Bootstrap/Tailwind + custom)
+  - [ ] Navigation bar với links:
+    - [ ] Dashboard (/)
+    - [ ] Alerts (/alerts)
+    - [ ] Monitor (/monitor)
+    - [ ] Settings (/settings)
+    - [ ] Model Info (/model)
+  - [ ] Footer với system info
+  - [ ] Block content: `{% block content %}{% endblock %}`
+  - [ ] Block scripts: `{% block scripts %}{% endblock %}`
+  - [ ] Include Chart.js CDN
+  - [ ] Include WebSocket.js
+- [ ] Register Jinja2Templates trong `app/main.py`:
+  ```python
+  from fastapi.templating import Jinja2Templates
+  templates = Jinja2Templates(directory="app/templates")
+  ```
+
+### 7.3 Dashboard Page
+- [ ] **app/templates/dashboard.html** - Home page
+  - [ ] Extend base.html
+  - [ ] Stats cards row (4 cards):
+    - [ ] Total Alerts (fetch từ `/api/stats`)
+    - [ ] Critical Alerts
+    - [ ] Active Monitoring status
+    - [ ] Model Accuracy
+  - [ ] Attack types pie chart (Chart.js)
+    - [ ] Data từ `/api/stats` → attack_types
+    - [ ] Colors: DoS Hulk (red), PortScan (orange), DDoS (purple)
+  - [ ] Timeline chart (Line chart)
+    - [ ] Data từ `/api/stats/timeline?period=day`
+    - [ ] X-axis: time, Y-axis: alert count
+  - [ ] Recent alerts table (5 rows)
+    - [ ] Data từ `/api/alerts/recent?n=5`
+    - [ ] Columns: Time, Type, Source IP, Severity
+    - [ ] Link to alert detail
+  - [ ] Auto-refresh every 10s (AJAX)
+- [ ] **Endpoint**: `@app.get("/", tags=["Frontend"])`
+  ```python
+  async def dashboard(request: Request):
+      return templates.TemplateResponse("dashboard.html", {"request": request})
+  ```
+
+### 7.4 Alerts Page
+- [ ] **app/templates/alerts.html** - Alerts list với filters
+  - [ ] Extend base.html
+  - [ ] Filter form (horizontal layout):
+    - [ ] Attack type dropdown (DoS Hulk, PortScan, DDoS, All)
+    - [ ] Severity dropdown (Critical, Low, All)
+    - [ ] Source IP input
+    - [ ] Date range picker (from/to)
+    - [ ] Apply button (AJAX submit)
+  - [ ] Alerts table (pagination):
+    - [ ] Columns: ID, Time, Attack Type, Source → Dest, Confidence, Severity, Actions
+    - [ ] Badge colors: Critical (red), Low (yellow)
+    - [ ] Action: Delete button (confirm modal)
+    - [ ] Click row → navigate to detail page
+  - [ ] Pagination controls:
+    - [ ] Previous/Next buttons
+    - [ ] Page numbers (1, 2, 3, ...)
+    - [ ] Items per page dropdown (10, 25, 50, 100)
+  - [ ] Data fetch từ `/api/alerts` với query params
+- [ ] **Endpoint**: `@app.get("/alerts", tags=["Frontend"])`
+  ```python
+  async def alerts_page(request: Request):
+      return templates.TemplateResponse("alerts.html", {"request": request})
+  ```
+
+### 7.5 Alert Detail Page
+- [ ] **app/templates/alert_detail.html** - Single alert view
+  - [ ] Extend base.html
+  - [ ] Breadcrumb: Home > Alerts > Alert #{id}
+  - [ ] Alert info card:
+    - [ ] ID, Timestamp
+    - [ ] Attack Type (badge)
+    - [ ] Severity (badge)
+    - [ ] Confidence (progress bar)
+  - [ ] Network info:
+    - [ ] Source IP (with WHOIS lookup button - optional)
+    - [ ] Destination IP
+  - [ ] Actions:
+    - [ ] Delete button (confirm modal)
+    - [ ] Add to Whitelist button
+    - [ ] Add to Blacklist button
+    - [ ] Back to list button
+  - [ ] Data fetch từ `/api/alerts/{alert_id}`
+- [ ] **Endpoint**: `@app.get("/alerts/{alert_id}", tags=["Frontend"])`
+  ```python
+  async def alert_detail(request: Request, alert_id: int):
+      return templates.TemplateResponse("alert_detail.html", {
+          "request": request,
+          "alert_id": alert_id
+      })
+  ```
+
+### 7.6 Monitor Page
+- [ ] **app/templates/monitor.html** - Real-time monitoring control
+  - [ ] Extend base.html
+  - [ ] Control panel:
+    - [ ] Start Monitoring button (green, large)
+    - [ ] Stop Monitoring button (red, large, disabled initially)
+    - [ ] Status indicator (badge: Active/Inactive)
+  - [ ] Live stats cards (auto-update every 2s):
+    - [ ] Packets Captured
+    - [ ] Active Flows
+    - [ ] Features Extracted
+    - [ ] Predictions Made
+    - [ ] Alerts Created
+  - [ ] Real-time alerts feed (WebSocket):
+    - [ ] Connect to `ws://localhost:8000/ws/alerts`
+    - [ ] Display alerts as they arrive (toast notifications)
+    - [ ] List of recent alerts (max 20, scroll)
+    - [ ] Each alert: Time, Type, Source IP, Confidence
+    - [ ] Color-coded by severity
+  - [ ] Network interface info (display only)
+  - [ ] Start/Stop AJAX calls to `/api/monitor/start` và `/api/monitor/stop`
+- [ ] **Endpoint**: `@app.get("/monitor", tags=["Frontend"])`
+  ```python
+  async def monitor_page(request: Request):
+      return templates.TemplateResponse("monitor.html", {"request": request})
+  ```
+
+### 7.7 Settings Page
+- [ ] **app/templates/settings.html** - Whitelist/Blacklist management
+  - [ ] Extend base.html
+  - [ ] Tabs navigation:
+    - [ ] Tab 1: Whitelist
+    - [ ] Tab 2: Blacklist
+  - [ ] **Whitelist Tab**:
+    - [ ] Add form: IP input, Description textarea, Add button
+    - [ ] Table: ID, IP Address, Description, Added At, Actions (Delete)
+    - [ ] Data từ `/api/whitelist`
+    - [ ] Add POST to `/api/whitelist`
+    - [ ] Delete DELETE to `/api/whitelist/{id}`
+  - [ ] **Blacklist Tab** (tương tự Whitelist):
+    - [ ] Same layout
+    - [ ] Data từ `/api/blacklist`
+  - [ ] IP validation (client-side + server-side)
+  - [ ] Delete confirmation modal
+  - [ ] Success/error toast notifications
+- [ ] **Endpoint**: `@app.get("/settings", tags=["Frontend"])`
+  ```python
+  async def settings_page(request: Request):
+      return templates.TemplateResponse("settings.html", {"request": request})
+  ```
+
+### 7.8 Model Info Page
+- [ ] **app/templates/model.html** - ML model information
+  - [ ] Extend base.html
+  - [ ] Model overview card:
+    - [ ] Algorithm (XGBoost)
+    - [ ] Version
+    - [ ] Features count (25)
+    - [ ] Classes (4): BENIGN, DoS Hulk, PortScan, DDoS
+  - [ ] Performance metrics:
+    - [ ] Overall accuracy (progress bar 99.95%)
+    - [ ] Per-class metrics table:
+      - [ ] Columns: Class, Precision, Recall, F1-Score
+      - [ ] Data từ `/api/model/metrics`
+  - [ ] Training info:
+    - [ ] Training date
+    - [ ] Dataset (CICIDS2017)
+    - [ ] Samples trained
+  - [ ] Configuration:
+    - [ ] Alert threshold (0.95)
+    - [ ] Deduplication window (60s)
+  - [ ] Model status badge (loaded/not loaded)
+  - [ ] Data từ `/api/model/info` và `/api/model/metrics`
+- [ ] **Endpoint**: `@app.get("/model", tags=["Frontend"])`
+  ```python
+  async def model_page(request: Request):
+      return templates.TemplateResponse("model.html", {"request": request})
+  ```
+
+### 7.9 JavaScript Utilities
+- [ ] **app/static/js/api.js** - API helper functions
+  - [ ] `fetchJSON(url)` - GET request
+  - [ ] `postJSON(url, data)` - POST request
+  - [ ] `deleteJSON(url)` - DELETE request
+  - [ ] Error handling wrapper
+- [ ] **app/static/js/websocket.js** - WebSocket client
+  - [ ] Connect to `/ws/alerts`
+  - [ ] Auto-reconnect on disconnect
+  - [ ] Event handlers: onOpen, onMessage, onClose, onError
+  - [ ] Broadcast custom events to page
+- [ ] **app/static/js/charts.js** - Chart.js wrappers
+  - [ ] `createPieChart(canvasId, data, labels)`
+  - [ ] `createLineChart(canvasId, data, labels)`
+  - [ ] `updateChart(chart, newData)`
+- [ ] **app/static/js/notifications.js** - Toast notifications
+  - [ ] `showSuccess(message)`
+  - [ ] `showError(message)`
+  - [ ] `showInfo(message)`
+  - [ ] Use Bootstrap Toast hoặc custom
+
+### 7.10 CSS Styling
+- [ ] **app/static/css/style.css** - Custom styles
+  - [ ] Color scheme (dark mode optional):
+    - [ ] Primary: #0d6efd (blue)
+    - [ ] Success: #198754 (green)
+    - [ ] Danger: #dc3545 (red)
+    - [ ] Warning: #ffc107 (yellow)
+  - [ ] Card shadows & borders
+  - [ ] Table hover effects
+  - [ ] Button hover states
+  - [ ] Badge styles (critical/low)
+  - [ ] Toast notification positioning
+  - [ ] Responsive breakpoints (mobile-first)
 
 ---
+
+**Copy toàn bộ 2 sections trên vào checklist tổng quan của bạn!**
 
 ## **PHASE 8: Attack Simulation Scripts**
 
