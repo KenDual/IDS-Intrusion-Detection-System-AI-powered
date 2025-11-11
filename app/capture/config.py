@@ -8,8 +8,7 @@ import os
 # CAPTURE SETTINGS
 # ===========================
 
-# INTERFACE = r"\Device\NPF_Loopback"  # Loopback for testing
-INTERFACE = r"\Device\NPF_{D9B6EFDD-8496-42FD-9897-59FE5CEA5BBE}"
+INTERFACE = "{D9B6EFDD-8496-42FD-9897-59FE5CEA5BBE}"
 FLOW_TIMEOUT = 5  # seconds - flows older than this are expired
 PROTOCOLS = ['TCP', 'UDP', 'ICMP']  # Protocols to capture
 

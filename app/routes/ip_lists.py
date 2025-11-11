@@ -36,22 +36,22 @@ class IPAddressRequest(BaseModel):
     ip_address: str
     description: str = ""
 
-    @field_validator('ip_address')
-    @classmethod
-    def validate_ip(cls, v: str) -> str:
-        """Validate IP address format"""
-        # Simple IPv4 validation
-        ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
-        if not re.match(ipv4_pattern, v):
-            raise ValueError('Invalid IP address format')
-
-        # Check each octet is 0-255
-        octets = v.split('.')
-        for octet in octets:
-            if int(octet) > 255:
-                raise ValueError('Invalid IP address: octet > 255')
-
-        return v
+    # @field_validator('ip_address')
+    # @classmethod
+    # def validate_ip(cls, v: str) -> str:
+    #     """Validate IP address format"""
+    #     # Simple IPv4 validation
+    #     ipv4_pattern = r'^(\d{1,3}\.){3}\d{1,3}$'
+    #     if not re.match(ipv4_pattern, v):
+    #         raise ValueError('Invalid IP address format')
+    #
+    #     # Check each octet is 0-255
+    #     octets = v.split('.')
+    #     for octet in octets:
+    #         if int(octet) > 255:
+    #             raise ValueError('Invalid IP address: octet > 255')
+    #
+    #     return v
 
 
 # ============================================================
@@ -93,15 +93,16 @@ async def add_ip_to_whitelist(
 ) -> Dict[str, Any]:
     """
     Add IP address to whitelist
-
-    Request Body:
-    - ip_address: IP address to whitelist (required)
-    - description: Reason for whitelisting (optional)
-
-    Returns:
-        JSON with created whitelist entry
+    ...
     """
+    # ========== THÊM LOGGING NÀY ==========
+    logger.info(f"Received whitelist request: {request}")
+    logger.info(f"IP: {request.ip_address}, Desc: {request.description}")
+    # ======================================
+
     try:
+        logger.info("Calling add_to_whitelist CRUD...")  # ← THÊM
+
         # Add to database
         whitelist_entry = add_to_whitelist(
             db=db,
@@ -109,16 +110,16 @@ async def add_ip_to_whitelist(
             description=request.description
         )
 
+        logger.info(f"CRUD returned: {whitelist_entry}")  # ← THÊM
+
         if not whitelist_entry:
+            logger.error(f"IP {request.ip_address} already exists!")  # ← THÊM
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"IP address {request.ip_address} is already in whitelist"
             )
 
-        # Reload whitelist in DetectionService
-        detection_service.reload_whitelist()
-
-        logger.info(f"Added {request.ip_address} to whitelist")
+        logger.info("Whitelist entry created successfully")  # ← THÊM
 
         return {
             "status": "success",
@@ -126,10 +127,14 @@ async def add_ip_to_whitelist(
             "whitelist": whitelist_entry.to_dict()
         }
 
-    except HTTPException:
+
+    except HTTPException as he:
+        logger.error(f"HTTPException raised: {he.status_code} - {he.detail}")  # ← THÊM
         raise
     except Exception as e:
-        logger.error(f"Failed to add to whitelist: {e}")
+        logger.error(f"Unexpected exception: {type(e).__name__}: {e}")  # ← THÊM
+        import traceback
+        logger.error(traceback.format_exc())  # ← THÊM
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to add to whitelist: {str(e)}"

@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Model Info - IDS System{% endblock %}
+
+{% block nav_model %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Machine Learning Model Information</h2>
+        <hr>
+    </div>
+</div>
+
+<!-- Model Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Model Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="text-muted mb-1">Algorithm</p>
+                        <p class="fw-bold" id="modelAlgorithm">Loading...</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-1">Version</p>
+                        <p class="fw-bold" id="modelVersion">Loading...</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-1">Features Count</p>
+                        <p class="fw-bold" id="featuresCount">Loading...</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="text-muted mb-1">Classes</p>
+                        <p class="fw-bold" id="classesCount">Loading...</p>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <p class="text-muted mb-1">Attack Classes</p>
+                        <p class="fw-bold" id="attackClasses">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Performance Metrics -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Performance Metrics</h5>
+            </div>
+            <div class="card-body">
+                <!-- Overall Accuracy -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold">Overall Accuracy</span>
+                        <span class="fw-bold text-success" id="overallAccuracy">0%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                        <div id="accuracyBar" class="progress-bar bg-success" role="progressbar" 
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            0%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Per-Class Metrics Table -->
+                <h6 class="mb-3">Per-Class Metrics</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover" id="metricsTable">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Training Info & Configuration -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Training Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-1">Training Date</p>
+                <p class="fw-bold mb-3" id="trainingDate">Loading...</p>
+
+                <p class="text-muted mb-1">Dataset</p>
+                <p class="fw-bold mb-3" id="datasetName">Loading...</p>
+
+                <p class="text-muted mb-1">Training Samples</p>
+                <p class="fw-bold mb-0" id="trainingSamples">Loading...</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">Configuration</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-1">Alert Threshold</p>
+                <p class="fw-bold mb-3" id="alertThreshold">Loading...</p>
+
+                <p class="text-muted mb-1">Deduplication Window</p>
+                <p class="fw-bold mb-3" id="dedupWindow">Loading...</p>
+
+                <p class="text-muted mb-1">Model Status</p>
+                <p class="mb-0">
+                    <span class="badge bg-success fs-6" id="modelStatus">Loaded</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Model page JavaScript will be added in Step 22
+console.log('Model page loaded');
+</script>
+{% endblock %}

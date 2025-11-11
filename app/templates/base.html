@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}IDS - Intrusion Detection System{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <strong>🛡️ IDS System</strong>
+            </a>
+            <div class="navbar-nav">
+                <a class="nav-link {% block nav_dashboard %}{% endblock %}" href="/">Dashboard</a>
+                <a class="nav-link {% block nav_monitor %}{% endblock %}" href="/monitor">Monitor</a>
+                <a class="nav-link {% block nav_alerts %}{% endblock %}" href="/alerts">Alerts</a>
+                <a class="nav-link {% block nav_settings %}{% endblock %}" href="/settings">Settings</a>
+                <a class="nav-link {% block nav_model %}{% endblock %}" href="/model">Model</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid mt-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 py-3 bg-light text-center">
+        <small class="text-muted">IDS - AI-Powered Intrusion Detection System v1.0</small>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Main JavaScript -->
+    <script src="/static/js/main.js"></script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

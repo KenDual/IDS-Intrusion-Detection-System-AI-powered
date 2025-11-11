@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - IDS System{% endblock %}
+
+{% block nav_settings %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Settings</h2>
+        <hr>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="whitelist-tab" data-bs-toggle="tab" 
+                        data-bs-target="#whitelist" type="button" role="tab">
+                    Whitelist
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="blacklist-tab" data-bs-toggle="tab" 
+                        data-bs-target="#blacklist" type="button" role="tab">
+                    Blacklist
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="settingsTabContent">
+            <!-- Whitelist Tab -->
+            <div class="tab-pane fade show active" id="whitelist" role="tabpanel">
+                <div class="card border-top-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Whitelist Management</h5>
+                        <p class="text-muted">IPs in whitelist will NOT generate alerts</p>
+
+                        <!-- Add Form -->
+                        <form id="addWhitelistForm" class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="whitelistIP" class="form-label">IP Address *</label>
+                                <input type="text" class="form-control" id="whitelistIP" 
+                                       placeholder="e.g., 192.168.1.100" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid IP address
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="whitelistDesc" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="whitelistDesc" 
+                                       placeholder="e.g., Admin workstation">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-success d-block w-100">
+                                    + Add
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="whitelistTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IP Address</th>
+                                        <th>Description</th>
+                                        <th>Added At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blacklist Tab -->
+            <div class="tab-pane fade" id="blacklist" role="tabpanel">
+                <div class="card border-top-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Blacklist Management</h5>
+                        <p class="text-muted">IPs in blacklist are marked as known threats</p>
+
+                        <!-- Add Form -->
+                        <form id="addBlacklistForm" class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="blacklistIP" class="form-label">IP Address *</label>
+                                <input type="text" class="form-control" id="blacklistIP" 
+                                       placeholder="e.g., 10.0.0.50" required>
+                                <div class="invalid-feedback">
+                                    Please enter a valid IP address
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="blacklistDesc" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="blacklistDesc" 
+                                       placeholder="e.g., Known attacker">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-danger d-block w-100">
+                                    + Add
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="blacklistTable">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>IP Address</th>
+                                        <th>Description</th>
+                                        <th>Added At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteIPModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete IP <strong id="deleteIPAddress"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteIPBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Settings page JavaScript will be added in Step 18
+console.log('Settings page loaded');
+</script>
+{% endblock %}

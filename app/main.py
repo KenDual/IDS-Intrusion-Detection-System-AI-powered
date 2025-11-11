@@ -3,6 +3,8 @@ FastAPI Application - IDS Backend API
 Main entry point for the web server
 """
 import logging
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from app.detection import get_connection_manager
 from app.routes import monitor, alerts, stats, ip_lists, model
@@ -55,6 +57,13 @@ async def lifespan(app: FastAPI):
         capture_service = get_capture_service()
         logger.info("CaptureService ready")
 
+        # 4. Start WebSocket broadcast worker
+        logger.info("Starting WebSocket broadcast worker...")
+        from app.detection.websocket_manager import get_connection_manager
+        ws_manager = get_connection_manager()
+        await ws_manager.start_worker()
+        logger.info("WebSocket broadcast worker started")
+
         logger.info("=" * 60)
         logger.info("IDS Backend API started successfully!")
         logger.info("API Docs: http://localhost:8000/docs")
@@ -84,6 +93,12 @@ async def lifespan(app: FastAPI):
             logger.info("Stopping CaptureService...")
             await capture_service.stop_monitoring()
 
+        # Stop WebSocket worker
+        logger.info("Stopping WebSocket broadcast worker...")
+        from app.detection.websocket_manager import get_connection_manager
+        ws_manager = get_connection_manager()
+        await ws_manager.stop_worker()
+
         logger.info("Shutdown complete")
 
     except Exception as e:
@@ -97,6 +112,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# ===== STATIC FILES & TEMPLATES =====
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
+templates = Jinja2Templates(directory="app/templates")
 
 app.include_router(monitor.router, prefix="/api/monitor", tags=["Monitor"])
 app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])
@@ -204,28 +223,30 @@ async def internal_error_handler(request: Request, exc):
 
 
 # ===== ROOT ENDPOINT =====
+@app.get("/", tags=["Frontend"])
+async def dashboard(request: Request):
+    """Dashboard page - System overview"""
+    return templates.TemplateResponse("dashboard.html", {"request": request})
 
-@app.get("/", tags=["Root"])
-async def root():
-    """
-    Root endpoint - API info
-    """
-    return {
-        "name": "IDS - AI-Powered Intrusion Detection System",
-        "version": "1.0.0",
-        "status": "running",
-        "docs": "/docs",
-        "endpoints": {
-            "monitor": "/api/monitor",
-            "alerts": "/api/alerts",
-            "statistics": "/api/stats",
-            "whitelist": "/api/whitelist",
-            "blacklist": "/api/blacklist",
-            "model": "/api/model",
-            "websocket": "/ws/alerts"
-        }
-    }
+@app.get("/monitor", tags=["Frontend"])
+async def monitor_page(request: Request):
+    """Monitor page - Real-time network monitoring"""
+    return templates.TemplateResponse("monitor.html", {"request": request})
 
+@app.get("/alerts", tags=["Frontend"])
+async def alerts_page(request: Request):
+    """Alerts page - View and manage security alerts"""
+    return templates.TemplateResponse("alerts.html", {"request": request})
+
+@app.get("/settings", tags=["Frontend"])
+async def settings_page(request: Request):
+    """Settings page - Manage whitelist and blacklist"""
+    return templates.TemplateResponse("settings.html", {"request": request})
+
+@app.get("/model", tags=["Frontend"])
+async def model_page(request: Request):
+    """Model page - ML model information and metrics"""
+    return templates.TemplateResponse("model.html", {"request": request})
 
 @app.get("/health", tags=["Health"])
 async def health_check():

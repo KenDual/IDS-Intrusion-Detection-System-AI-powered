@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Test Page{% endblock %}
+
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Base Template Test</h1>
+        <p>If you can see this page with navigation bar, base template is working!</p>
+        
+        <button class="btn btn-primary" onclick="showSuccess('Success test!')">Test Success Toast</button>
+        <button class="btn btn-danger" onclick="showError('Error test!')">Test Error Toast</button>
+        <button class="btn btn-info" onclick="showInfo('Info test!')">Test Info Toast</button>
+    </div>
+</div>
+{% endblock %}

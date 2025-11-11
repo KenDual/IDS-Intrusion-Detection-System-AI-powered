@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Monitor - IDS System{% endblock %}
+
+{% block nav_monitor %}active{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>Real-time Network Monitoring</h2>
+        <hr>
+    </div>
+</div>
+
+<!-- Control Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Control Panel</h5>
+                <div class="d-flex align-items-center gap-3">
+                    <button id="startBtn" class="btn btn-success btn-lg">
+                        ▶ Start Monitoring
+                    </button>
+                    <button id="stopBtn" class="btn btn-danger btn-lg" disabled>
+                        ⏹ Stop Monitoring
+                    </button>
+                    <span id="statusBadge" class="badge bg-secondary fs-6">Inactive</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Packets Captured</h6>
+                <h3 class="card-title mb-0" id="statsPackets">0</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Active Flows</h6>
+                <h3 class="card-title mb-0" id="statsFlows">0</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Features Extracted</h6>
+                <h3 class="card-title mb-0" id="statsFeatures">0</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Predictions Made</h6>
+                <h3 class="card-title mb-0" id="statsPredictions">0</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">Alerts Created</h6>
+                <h3 class="card-title mb-0" id="statsAlerts">0</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Alerts Feed -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Real-time Alerts</h5>
+                <span id="wsStatus" class="badge bg-secondary">Disconnected</span>
+            </div>
+            <div class="card-body">
+                <div id="alertsFeed" style="max-height: 400px; overflow-y: auto;">
+                    <p class="text-muted text-center">No alerts yet. Start monitoring to see alerts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Monitor page JavaScript will be added in Step 6
+    console.log('Monitor page loaded');
+</script>
+{% endblock %}
